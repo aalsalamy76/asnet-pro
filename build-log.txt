@@ -1,0 +1,52 @@
+
+Running Gradle task 'assembleRelease'...                        
+Your project is configured with Android NDK 23.1.7779620, but the following plugin(s) depend on a different Android NDK version:
+- connectivity_plus requires Android NDK 27.0.12077973
+- device_info_plus requires Android NDK 27.0.12077973
+- flutter_secure_storage requires Android NDK 27.0.12077973
+- mobile_scanner requires Android NDK 27.0.12077973
+- network_info_plus requires Android NDK 27.0.12077973
+- path_provider_android requires Android NDK 27.0.12077973
+- permission_handler_android requires Android NDK 27.0.12077973
+- share_plus requires Android NDK 27.0.12077973
+- shared_preferences_android requires Android NDK 27.0.12077973
+- url_launcher_android requires Android NDK 27.0.12077973
+Fix this issue by using the highest Android NDK version (they are backward compatible).
+Add the following to /home/runner/work/asnet-pro/asnet-pro/projet/asnet/android/app/build.gradle:
+
+    android {
+        ndkVersion = "27.0.12077973"
+        ...
+    }
+
+Expected to find fonts for (MaterialIcons, packages/cupertino_icons/CupertinoIcons), but found (MaterialIcons). This usually means you are referring to font families in an IconData class but not including them in the assets section of your pubspec.yaml, are missing the package that would include them, or are missing "uses-material-design: true".
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 14936 bytes (99.1% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Caught exception: Already watching path: /home/runner/work/asnet-pro/asnet-pro/projet/asnet/android
+Running Gradle task 'assembleRelease'...                          299.7s
+✓ Built build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk (16.4MB)
+✓ Built build/app/outputs/flutter-apk/app-arm64-v8a-release.apk (17.0MB)
+✓ Built build/app/outputs/flutter-apk/app-x86_64-release.apk (17.6MB)
+
+Running Gradle task 'assembleRelease'...                        
+Your project is configured with Android NDK 23.1.7779620, but the following plugin(s) depend on a different Android NDK version:
+- connectivity_plus requires Android NDK 27.0.12077973
+- device_info_plus requires Android NDK 27.0.12077973
+- flutter_secure_storage requires Android NDK 27.0.12077973
+- mobile_scanner requires Android NDK 27.0.12077973
+- network_info_plus requires Android NDK 27.0.12077973
+- path_provider_android requires Android NDK 27.0.12077973
+- permission_handler_android requires Android NDK 27.0.12077973
+- share_plus requires Android NDK 27.0.12077973
+- shared_preferences_android requires Android NDK 27.0.12077973
+- url_launcher_android requires Android NDK 27.0.12077973
+Fix this issue by using the highest Android NDK version (they are backward compatible).
+Add the following to /home/runner/work/asnet-pro/asnet-pro/projet/asnet/android/app/build.gradle:
+
+    android {
+        ndkVersion = "27.0.12077973"
+        ...
+    }
+
+Caught exception: Already watching path: /home/runner/work/asnet-pro/asnet-pro/projet/asnet/android
+Running Gradle task 'assembleRelease'...                            9.4s
+✓ Built build/app/outputs/flutter-apk/app-release.apk (38.9MB)
