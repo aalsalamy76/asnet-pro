@@ -1,0 +1,74 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decompresser le zip
+        run: |
+          ZIP=$(find . -maxdepth 1 -name '*.zip' | head -n 1)
+          if [ -z "$ZIP" ]; then echo "Aucun .zip a la racine du depot" | tee build-log.txt; exit 1; fi
+          unzip -q -o "$ZIP" -d projet
+          PUBSPEC=$(find projet -name pubspec.yaml -not -path '*/.dart_tool/*' | head -n 1)
+          echo "PROJECT_DIR=$(dirname "$PUBSPEC")" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.5"
+          channel: stable
+
+      - name: Analyse du code
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          flutter pub get 2>&1 | tee "$GITHUB_WORKSPACE/pub-log.txt"
+          flutter analyze --no-fatal-infos --no-fatal-warnings > "$GITHUB_WORKSPACE/analyze-log.txt" 2>&1 || true
+
+      - name: Compiler l'APK
+        working-directory: ${{ env.PROJECT_DIR }}
+        shell: bash
+        run: |
+          set -o pipefail
+          { flutter build apk --release --split-per-abi && flutter build apk --release; } 2>&1 | tee "$GITHUB_WORKSPACE/build-log.txt"
+          ls -lh build/app/outputs/flutter-apk/
+
+      - name: Enregistrer les journaux (branche logs)
+        if: always()
+        shell: bash
+        run: |
+          rm -rf /tmp/logs && mkdir /tmp/logs
+          for f in build-log.txt analyze-log.txt pub-log.txt; do
+            if [ -f "$GITHUB_WORKSPACE/$f" ]; then cp "$GITHUB_WORKSPACE/$f" /tmp/logs/; fi
+          done
+          echo "run ${{ github.run_number }} - statut ${{ job.status }}" > /tmp/logs/status.txt
+          cd /tmp/logs
+          git init -q -b logs
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -q -m "Journaux du build ${{ github.run_number }}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" logs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: asnet-apk
+          path: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/*.apk
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.2.0-build${{ github.run_number }}
+          name: A.SNet 0.2 build ${{ github.run_number }}
+          files: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/*.apk
